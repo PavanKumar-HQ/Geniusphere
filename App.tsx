@@ -31,7 +31,6 @@ import { COURSES, SECTORS, VIDEOS, GALLERY_DATA, FAQS, VIDEO_TESTIMONIALS, TRAIN
 import { VideoResource, GalleryItem, FAQItem, VideoTestimonial, Student, EducationalResource, ResourceType, Course, Trainer, Ambassador, LearningMood } from './types';
 import { motion as motionBase, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { DailyWisdom } from './components/DailyWisdom';
-import { BackgroundMusic } from './components/BackgroundMusic';
 
 const motion = motionBase as any;
 
@@ -635,7 +634,6 @@ function App() {
           <InstallPWA />
           {/* <AiAssistant /> */}
           <EasterEggRobot />
-          <BackgroundMusic />
 
           {currentView !== 'course-player' && currentView !== 'local-space' && (
             <footer className="bg-black/80 backdrop-blur-md border-t border-white/5 py-16 text-center relative z-10">
