@@ -207,33 +207,41 @@ export const FactsMarqueeWidget: React.FC = () => {
                 <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-slate-900/0 md:from-slate-900/0 z-10" />
                 <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-slate-900/0 md:from-slate-900/0 z-10" />
 
-                <motion.div
-                    className="flex flex-col gap-3"
-                    animate={{
-                        y: [0, -700] // Fine-tuned for seamless loop
-                    }}
-                    transition={{
-                        y: {
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            duration: 45, // Further reduced speed
-                            ease: "linear"
-                        }
-                    }}
+                <div
+                    className="flex flex-col gap-3 animate-marquee will-change-transform"
                 >
-                    {[...facts, ...facts, ...facts].map((fact, i) => (
-                        <div key={i} className="p-3 bg-slate-800 border border-white/10 rounded-xl shadow-lg flex items-center gap-3 hover:bg-slate-700/50 transition-colors group/fact">
+                    {/* Render fewer items to reduce DOM weight, but enough for a smooth loop */}
+                    {[...facts, ...facts].map((fact, i) => (
+                        <div key={i} className="p-3 bg-slate-800 border border-white/10 rounded-xl shadow-lg flex items-center gap-3 hover:bg-slate-700/50 transition-colors group/fact transform-gpu">
                             <span className="w-2 h-2 shrink-0 rounded-full bg-pink-500 group-hover/fact:scale-125 transition-transform" />
                             <span className="text-slate-200 text-sm font-medium leading-relaxed">{fact}</span>
                         </div>
                     ))}
-                </motion.div>
+                </div>
             </div>
 
             <style>{`
                 .mask-linear-fade {
-                    mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
-                    -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+                    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+                    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+                }
+                
+                @keyframes marquee {
+                    0% { transform: translateY(0); }
+                    100% { transform: translateY(-50%); }
+                }
+
+                .animate-marquee {
+                    animation: marquee 60s linear infinite;
+                }
+                
+                .will-change-transform {
+                    will-change: transform;
+                }
+
+                /* Pause on hover for better UX and performance when reading */
+                .group:hover .animate-marquee {
+                    animation-play-state: paused;
                 }
             `}</style>
         </div>
@@ -450,13 +458,11 @@ export const DailyWordWidget: React.FC = () => {
     ];
 
     // Select a word based on the date to make it "Daily" but repetitive/cycling
-    const getDailyWord = () => {
+    const dailyWord = React.useMemo(() => {
         const today = new Date();
         const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
         return words[dayOfYear % words.length];
-    };
-
-    const dailyWord = getDailyWord();
+    }, []);
 
     return (
         <div className="rounded-2xl bg-slate-800/40 border border-white/5 p-6 hover:bg-slate-800/60 transition-colors flex flex-col justify-between min-h-[220px] group relative overflow-hidden">
