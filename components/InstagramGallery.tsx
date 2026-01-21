@@ -50,7 +50,7 @@ const Icons = {
 
 const socialPlatforms = [
     { name: 'Instagram', icon: Icons.Instagram, color: 'text-pink-500', url: 'https://www.instagram.com/official_geniusphere/' },
-    { name: 'Discord', icon: Icons.Discord, color: 'text-indigo-500', url: 'https://discord.com' },
+    { name: 'Discord', icon: Icons.Discord, color: 'text-indigo-500', url: 'https://discord.gg/7WZtYS2BkA' },
     { name: 'X (Twitter)', icon: Icons.X, color: 'text-white', url: 'https://x.com' },
     { name: 'Reddit', icon: Icons.Reddit, color: 'text-orange-500', url: 'https://www.reddit.com/r/Geniusphere_Hub/' },
     { name: 'WhatsApp', icon: Icons.WhatsApp, color: 'text-green-500', url: 'https://whatsapp.com/channel/0029VaANnkkDOQIRNCUAfp3o' },
@@ -330,15 +330,15 @@ export const CommunityEvents: React.FC<CommunityEventsProps> = ({ ambassadors = 
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.05 }}
                                             className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${idx === 0 ? 'bg-gradient-to-r from-yellow-500/10 to-transparent border-yellow-500/30' :
-                                                    idx === 1 ? 'bg-slate-800/40 border-slate-600/30' :
-                                                        idx === 2 ? 'bg-orange-800/20 border-orange-700/30' :
-                                                            'bg-slate-900/40 border-white/5'
+                                                idx === 1 ? 'bg-slate-800/40 border-slate-600/30' :
+                                                    idx === 2 ? 'bg-orange-800/20 border-orange-700/30' :
+                                                        'bg-slate-900/40 border-white/5'
                                                 }`}
                                         >
                                             <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg md:text-xl shadow-lg ${idx === 0 ? 'bg-yellow-500 text-black' :
-                                                    idx === 1 ? 'bg-slate-300 text-black' :
-                                                        idx === 2 ? 'bg-orange-600 text-white' :
-                                                            'bg-slate-800 text-slate-500'
+                                                idx === 1 ? 'bg-slate-300 text-black' :
+                                                    idx === 2 ? 'bg-orange-600 text-white' :
+                                                        'bg-slate-800 text-slate-500'
                                                 }`}>
                                                 {idx + 1}
                                             </div>

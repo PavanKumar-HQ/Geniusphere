@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, User, Menu, X, ShieldCheck, Sparkles, Video, ChevronLeft, Home, Mail } from 'lucide-react';
+import { LayoutGrid, User, Menu, X, ShieldCheck, Sparkles, Video, ChevronLeft, Home, Mail, Compass } from 'lucide-react';
 import { SectorTiles } from './components/SectorTiles';
 import { CourseCard } from './components/CourseCard';
 import { ServicesGrid } from './components/ServicesGrid';
 import { DashboardPreview } from './components/DashboardPreview';
-import { AiAssistant } from './components/AiAssistant';
 import { LoadingScreen } from './components/LoadingScreen';
 import { LoginFlow } from './components/LoginFlow';
 import { WhatIsGeniusphere } from './components/WhatIsGeniusphere';
@@ -21,10 +20,18 @@ import { ResourcesPreview } from './components/ResourcesPreview';
 import { CoursePlayer } from './components/CoursePlayer';
 import { LocalCommunitySpace } from './components/LocalCommunitySpace';
 import { ContactSection } from './components/ContactSection';
+import { InstallPWA } from './components/InstallPWA';
+import { GuidanceQuiz } from './components/GuidanceQuiz';
+import { Toast } from './components/Toast';
+import { SessionManager } from './components/SessionManager';
+import { CybersecurityLab } from './components/cybersecurity/CybersecurityLab';
+import { StudentInteractiveZone, EasterEggRobot } from './components/GamificationComponents';
 
 import { COURSES, SECTORS, VIDEOS, GALLERY_DATA, FAQS, VIDEO_TESTIMONIALS, TRAINERS_DATA, EDUCATIONAL_RESOURCES, MOCK_AMBASSADORS } from './constants';
-import { VideoResource, GalleryItem, FAQItem, VideoTestimonial, Student, EducationalResource, ResourceType, Course, Trainer, Ambassador } from './types';
+import { VideoResource, GalleryItem, FAQItem, VideoTestimonial, Student, EducationalResource, ResourceType, Course, Trainer, Ambassador, LearningMood } from './types';
 import { motion as motionBase, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { DailyWisdom } from './components/DailyWisdom';
+import { BackgroundMusic } from './components/BackgroundMusic';
 
 const motion = motionBase as any;
 
@@ -40,8 +47,25 @@ function App() {
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [activeSimulation, setActiveSimulation] = useState<string | null>(null);
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
+  const [showGuidance, setShowGuidance] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
-  // State to handle which tab to open in resources view (video, blog, ebook)
+  // Zen / Zero Pressure Features
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [mood, setMood] = useState<LearningMood>('calm');
+
+  const handleWander = () => {
+    const moods = ['video', 'blog', 'courses'];
+    const random = moods[Math.floor(Math.random() * moods.length)];
+    if (random === 'courses') {
+      handleNavigation('courses');
+      setToastMessage("Wander Result: Exploring Course Catalog");
+    } else {
+      handleViewLibrary(random as any);
+      setToastMessage(`Wander Result: Exploring ${random === 'video' ? 'Videos' : 'Blogs'}`);
+    }
+  };
   const [resourceViewTab, setResourceViewTab] = useState<ResourceType>('video');
 
   // Dynamic Content State
@@ -62,6 +86,16 @@ function App() {
     window.scrollTo(0, 0);
   }, [currentView]);
 
+  // Auto-trigger Guidance Quiz for new users
+  useEffect(() => {
+    const isCompleted = localStorage.getItem('geniusphere_onboarding_completed');
+    if (!isCompleted && appState === 'app') {
+      // Small delay to let animations finish
+      const timer = setTimeout(() => setShowGuidance(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [appState]);
+
   const handleLoadingComplete = () => {
     setAppState('login');
   };
@@ -69,21 +103,72 @@ function App() {
   const handleLoginComplete = (mode: ViewMode) => {
     setViewMode(mode);
     setAppState('app');
+
+    // Check if onboarding is complete
+    const isCompleted = localStorage.getItem('geniusphere_onboarding_completed');
+
     if (mode === 'workspace') {
       setCurrentView('dashboard');
+      // Only show wisdom if they've already onboarded
+      if (isCompleted) setShowWelcomePopup(true);
+    } else {
+      if (!isCompleted) {
+        // New User: Show Quiz First, hide Wisdom
+        setShowWelcomePopup(false);
+        setTimeout(() => setShowGuidance(true), 1000);
+      } else {
+        // Returning User: Show Wisdom
+        setShowWelcomePopup(true);
+      }
     }
   };
 
-  const handleNavigation = (view: View) => {
+  // Sync internal navigation with Browser History for Back Button support
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view) {
+        setCurrentView(event.state.view);
+        // Handle deep links or specific states if needed
+        if (event.state.sector) setSelectedSector(event.state.sector);
+      } else {
+        // Fallback or default to home
+        const hash = window.location.hash.replace('#', '') as View;
+        if (['home', 'courses', 'services', 'resources', 'dashboard', 'course-player', 'local-space'].includes(hash)) {
+          setCurrentView(hash);
+        } else {
+          setCurrentView('home');
+        }
+      }
+    };
+
+    // Initial load check
+    const hash = window.location.hash.replace('#', '') as View;
+    if (['home', 'courses', 'services', 'resources', 'dashboard', 'course-player', 'local-space'].includes(hash)) {
+      setCurrentView(hash);
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleNavigation = (view: View, shouldPushState = true) => {
     setCurrentView(view);
     setActiveSimulation(null); // Ensure simulation modal closes on nav
     setIsMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (shouldPushState) {
+      const url = `/#${view}`;
+      window.history.pushState({ view }, '', url);
+    }
   };
 
   const handleSectorExplore = (sectorName: string) => {
     setSelectedSector(sectorName);
-    handleNavigation('courses');
+    // Determine target view
+    const targetView: View = 'courses';
+    setCurrentView(targetView);
+    window.history.pushState({ view: targetView, sector: sectorName }, '', `/#${targetView}`);
   };
 
   // Updated to accept type for deep linking
@@ -118,101 +203,109 @@ function App() {
     ? courses
     : courses.filter(c => c.sector === selectedSector);
 
-  const Navbar = () => (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "circOut" }}
-      className="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/10"
-    >
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="flex items-center gap-2 cursor-pointer group"
-              onClick={() => handleNavigation('home')}
-            >
-              <img
-                src="/images/geniusphere-logo.jpg"
-                alt="Geniusphere Logo"
-                className="w-9 h-9 rounded-xl object-cover shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform border border-white/10"
-              />
-              <span className="text-xl font-bold text-white tracking-tight group-hover:text-cyanGlow transition-colors">Geniusphere</span>
-            </div>
-          </div>
+  const Navbar = () => {
+    if (isFocusMode) return null;
 
+    return (
+      <>
+        <motion.nav
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.5, ease: "circOut" }}
+          className="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-xl border-b border-white/10"
+        >
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-2 cursor-pointer group"
+                  onClick={() => handleNavigation('home')}
+                >
+                  <img
+                    src="/logo-192.png"
+                    alt="Geniusphere Logo"
+                    className="w-9 h-9 rounded-xl object-cover shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform border border-white/10"
+                  />
+                  <span className="text-xl font-bold text-white tracking-tight group-hover:text-cyanGlow transition-colors">Geniusphere</span>
+                </div>
+              </div>
 
-          <div className="hidden md:flex items-center gap-8">
-            {/* Always show navigation links in explorer mode */}
-            {viewMode === 'explorer' && (
-              <>
-                {['home', 'courses', 'services', 'resources'].map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => handleNavigation(item as View)}
-                    className={`capitalize text-sm font-medium hover:text-cyanGlow transition-colors ${currentView === item ? 'text-cyanGlow' : 'text-slate-300'}`}
-                  >
-                    {item}
-                  </button>
-                ))}
-                <div className="h-4 w-px bg-white/10"></div>
-              </>
-            )}
+              <div className="hidden md:flex items-center gap-8">
+                {viewMode === 'explorer' && (
+                  <>
+                    {['home', 'courses', 'services', 'resources'].map((item) => (
+                      <button
+                        key={item}
+                        onClick={() => handleNavigation(item as View)}
+                        className={`capitalize text-sm font-medium hover:text-cyanGlow transition-colors ${currentView === item ? 'text-cyanGlow' : 'text-slate-300'}`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                    <div className="h-4 w-px bg-white/10"></div>
+                  </>
+                )}
 
-            <button
-              onClick={handleModeChange}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:border-cyanGlow/30"
-            >
-              <motion.div
-                initial={false}
-                animate={{ rotate: viewMode === 'explorer' ? 0 : 180 }}
-              >
-                {viewMode === 'explorer' ? <User size={16} className="text-blue-400" /> : <LayoutGrid size={16} className="text-softMint" />}
-              </motion.div>
-              <span className="text-xs font-medium text-white">
-                {viewMode === 'explorer' ? 'Student View' : 'Admin Dashboard'}
-              </span>
-            </button>
-          </div>
-
-          <button className="md:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-black border-b border-white/10 px-6 overflow-hidden"
-          >
-            <div className="py-4 space-y-4">
-              {viewMode === 'explorer' ? (
-                <>
-                  <button onClick={() => handleNavigation('home')} className="block text-slate-300 hover:text-white w-full text-left">Home</button>
-                  <button onClick={() => handleNavigation('courses')} className="block text-slate-300 hover:text-white w-full text-left">Courses</button>
-                  <button onClick={() => handleNavigation('services')} className="block text-slate-300 hover:text-white w-full text-left">Services</button>
-                  <button onClick={() => handleNavigation('resources')} className="block text-slate-300 hover:text-white w-full text-left">Resources</button>
-                </>
-              ) : (
-                <button onClick={() => { handleNavigation('home'); setViewMode('explorer') }} className="flex items-center gap-2 text-cyanGlow w-full text-left font-bold">
-                  <Home size={16} /> Back to Home
-                </button>
-              )}
-              <div className="pt-4 mt-4 border-t border-white/10">
-                <button onClick={handleModeChange} className="block text-slate-300 hover:text-white w-full text-left">
-                  Switch to {viewMode === 'explorer' ? 'Admin Dashboard' : 'Student View'}
+                <button
+                  onClick={handleModeChange}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:border-cyanGlow/30"
+                >
+                  <div className="flex items-center gap-2">
+                    {viewMode === 'explorer' ? <User size={16} className="text-blue-400" /> : <LayoutGrid size={16} className="text-emerald-400" />}
+                    <span className="text-xs font-medium text-white">{viewMode === 'explorer' ? 'Student View' : 'Admin Dashboard'}</span>
+                  </div>
                 </button>
               </div>
+
+              <button className="md:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X /> : <Menu />}
+              </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
-  );
+          </div>
+        </motion.nav>
+
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="fixed top-20 left-0 right-0 z-40 bg-black/95 border-b border-white/10 px-6 overflow-hidden md:hidden"
+            >
+              <div className="py-4 space-y-4">
+                {viewMode === 'explorer' ? (
+                  <>
+                    {['home', 'courses', 'services', 'resources'].map((item) => (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          handleNavigation(item as View);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`block w-full text-left capitalize text-sm font-medium hover:text-cyanGlow transition-colors ${currentView === item ? 'text-cyanGlow' : 'text-slate-300'}`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <div className="text-sm text-slate-500">Admin Menu is Desktop Only</div>
+                )}
+                <div className="h-px w-full bg-white/10 my-2"></div>
+                <button
+                  onClick={() => { handleModeChange(); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-2 w-full text-left bg-white/5 p-3 rounded-lg"
+                >
+                  {viewMode === 'explorer' ? <User size={16} className="text-blue-400" /> : <LayoutGrid size={16} className="text-emerald-400" />}
+                  <span className="text-sm font-medium text-white">{viewMode === 'explorer' ? 'Switch to Admin' : 'Switch to Student'}</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  };
 
   const Hero = () => (
     <section className="pt-40 pb-32 px-6 relative overflow-hidden min-h-[90vh] flex items-center justify-center">
@@ -262,6 +355,7 @@ function App() {
           >
             Start Learning <Sparkles size={20} />
           </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
             whileTap={{ scale: 0.95 }}
@@ -344,9 +438,10 @@ function App() {
                       animate="animate"
                       exit="exit"
                     >
-                      <Hero />
+                      <Hero mood={mood} />
                       <WhatIsGeniusphere />
                       <SectorTiles onExplore={handleSectorExplore} />
+                      <StudentInteractiveZone />
                       <VideoTestimonials items={testimonials} />
                       <ServicesGrid />
                       <ResourcesPreview onViewAll={handleViewLibrary} />
@@ -471,7 +566,17 @@ function App() {
 
           {/* Interactive Learning Modal */}
           <AnimatePresence>
-            {activeSimulation && (
+            {activeSimulation === 'cyber-lab' ? (
+              <motion.div
+                key="cyber-lab"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="fixed inset-0 z-[60]"
+              >
+                <CybersecurityLab onClose={() => setActiveSimulation(null)} />
+              </motion.div>
+            ) : activeSimulation && (
               <InteractiveLearning
                 simulationId={activeSimulation}
                 onClose={() => setActiveSimulation(null)}
@@ -480,7 +585,57 @@ function App() {
             )}
           </AnimatePresence>
 
-          <AiAssistant />
+          <AnimatePresence>
+            {showGuidance && (
+              <GuidanceQuiz
+                onClose={() => {
+                  setShowGuidance(false);
+                  // Even if they close/skip, let's show them the wisdom card now
+                  setTimeout(() => setShowWelcomePopup(true), 500);
+                }}
+                onComplete={(answers) => {
+                  setShowGuidance(false);
+                  localStorage.setItem('geniusphere_onboarding_completed', 'true');
+
+                  // Simple Recommendation Logic (No API)
+                  const interests = answers.interests || [];
+                  let recommendedSector = 'Professional'; // Default
+
+                  if (interests.some((i: string) => i.includes('Finance') || i.includes('money'))) {
+                    recommendedSector = 'Finance';
+                  } else if (interests.some((i: string) => i.includes('website') || i.includes('Cybersecurity') || i.includes('AI'))) {
+                    recommendedSector = 'Technology';
+                  }
+
+                  // Apply Recommendation
+                  setToastMessage(`Based on your goal to "${answers.goal || 'learn'}", we recommend starting with ${recommendedSector} courses.`);
+                  setSelectedSector(recommendedSector);
+                  handleNavigation('courses');
+
+                  // Now show the wisdom card
+                  setTimeout(() => setShowWelcomePopup(true), 1500);
+                }}
+              />
+            )}
+          </AnimatePresence>
+
+          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+          <DailyWisdom
+            isOpen={showWelcomePopup}
+            onClose={() => setShowWelcomePopup(false)}
+          />
+
+          {/* ZenHub Removed */}
+          <SessionManager
+            currentMood={mood}
+            onWander={handleWander}
+            onExplore={() => handleNavigation('courses')}
+          />
+
+          <InstallPWA />
+          {/* <AiAssistant /> */}
+          <EasterEggRobot />
+          <BackgroundMusic />
 
           {currentView !== 'course-player' && currentView !== 'local-space' && (
             <footer className="bg-black/80 backdrop-blur-md border-t border-white/5 py-16 text-center relative z-10">

@@ -31,14 +31,14 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
 
       {/* Floating Background Elements (Interactive) */}
-      <motion.div 
+      <motion.div
         animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
         transition={{ duration: 6, repeat: Infinity }}
         className="absolute top-20 left-20 text-blue-500/20 hidden md:block"
       >
         <GraduationCap size={120} />
       </motion.div>
-      <motion.div 
+      <motion.div
         animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
         transition={{ duration: 7, repeat: Infinity, delay: 1 }}
         className="absolute bottom-20 right-20 text-neonPurple/20 hidden md:block"
@@ -65,9 +65,9 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
               </div>
 
               <div className="space-y-6">
-                 <p className="text-center text-slate-300 text-sm leading-relaxed">
-                   Step into a verified educational ecosystem powered by AI and immersive technology.
-                 </p>
+                <p className="text-center text-slate-300 text-sm leading-relaxed">
+                  Step into a verified educational ecosystem powered by AI and immersive technology.
+                </p>
 
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -79,7 +79,7 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                   {!isLoading && <ArrowRight size={20} />}
                 </motion.button>
               </div>
-              
+
             </motion.div>
           ) : (
             <motion.div
@@ -96,11 +96,10 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setSelectedMode('explorer')}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${
-                    selectedMode === 'explorer' 
-                      ? 'bg-blue-500/20 border-cyanGlow ring-1 ring-cyanGlow' 
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${selectedMode === 'explorer'
+                      ? 'bg-blue-500/20 border-cyanGlow ring-1 ring-cyanGlow'
                       : 'bg-slate-800/50 border-white/10 hover:border-white/20'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-4 relative z-10">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-neonPurple to-blue-500 flex items-center justify-center">
@@ -118,11 +117,10 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setSelectedMode('workspace')}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${
-                    selectedMode === 'workspace' 
-                      ? 'bg-emerald-500/20 border-softMint ring-1 ring-softMint' 
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${selectedMode === 'workspace'
+                      ? 'bg-emerald-500/20 border-softMint ring-1 ring-softMint'
                       : 'bg-slate-800/50 border-white/10 hover:border-white/20'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-4 relative z-10">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-softMint flex items-center justify-center">
@@ -142,11 +140,10 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                 whileHover={selectedMode ? { scale: 1.02 } : {}}
                 whileTap={selectedMode ? { scale: 0.98 } : {}}
                 onClick={() => selectedMode && onComplete(selectedMode)}
-                className={`w-full mt-8 py-3.5 rounded-xl font-bold transition-all ${
-                  selectedMode 
-                    ? 'bg-white text-midnight hover:shadow-lg hover:shadow-white/20' 
+                className={`w-full mt-8 py-3.5 rounded-xl font-bold transition-all ${selectedMode
+                    ? 'bg-white text-midnight hover:shadow-lg hover:shadow-white/20'
                     : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 Launch Platform
               </motion.button>

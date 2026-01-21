@@ -175,3 +175,5 @@ export interface Ambassador {
   rank: number;
   avatarUrl: string;
 }
+
+export type LearningMood = 'calm' | 'focus' | 'video' | 'courses' | 'blog';

@@ -215,7 +215,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Security', 'Privacy', 'Hacking'],
     status: 'active',
-    simulationId: 'sim_cyber_phishing',
+    simulationId: 'cyber-lab',
     modules: [
       { id: 'cyber_m1', title: 'Cyber Basics for Students', description: 'Understand what cybersecurity really means, why it is important for every student today, and the different types of threats you may encounter online', videoUrl: 'https://youtu.be/c5-cTCO4ZpI?si=5C7f0ueLcSMPNpgJ', duration: '10:00', contentMarkdown: 'Module 1: Cyber Basics for Students' },
       { id: 'cyber_m2', title: 'Building Safe Digital Foundations', description: 'Learn the difference between cyber safety and cybersecurity, understand your personal role in keeping the digital world secure', videoUrl: 'https://youtu.be/EswiqGU2upA?si=wwyF3VfNV1X4tbcK', duration: '10:00', contentMarkdown: 'Module 2: Building Safe Digital Foundations' },
@@ -228,7 +228,143 @@ export const COURSES: Course[] = [
       { id: 'cyber_m9', title: 'Responsible & Respectful Online Conduct', description: 'Practice good digital manners (netiquette), stay safe while gaming or making in-game purchases, and understand why guidance from parents and teachers helps', videoUrl: 'https://youtu.be/Os9yLcXJ2BA?si=BTNZuEia6sFZZma0', duration: '10:00', contentMarkdown: 'Module 9: Responsible & Respectful Online Conduct' },
       { id: 'cyber_m10', title: 'Becoming a Smart Digital Citizen', description: 'Learn what it means to be a responsible digital citizen, understand how cybersecurity is a team effort, and remember: stay alert, stay safe', videoUrl: 'https://youtu.be/XlPKiT-0MGs?si=SHB3C3LukkMZSkZb', duration: '10:00', contentMarkdown: 'Module 10: Becoming a Smart Digital Citizen' }
     ],
-    quiz: createMockQuiz('Cybersecurity')
+    quiz: {
+      passThreshold: 70,
+      questions: [
+        {
+          id: 'q_sec_01',
+          text: 'What is the primary goal of cybersecurity?',
+          options: [
+            'To make computers run faster',
+            'To protect systems, networks, and data from digital attacks',
+            'To monitor all employee activities',
+            'To create better video games'
+          ],
+          correctIndex: 1
+        },
+        {
+          id: 'q_sec_02',
+          text: 'Which of the following creates the strongest password?',
+          options: [
+            'Your birthdate (e.g., 1990)',
+            'The word "password123"',
+            'A mix of 12+ uppercase, lowercase, numbers, and symbols',
+            'Your pet\'s name'
+          ],
+          correctIndex: 2
+        },
+        {
+          id: 'q_sec_03',
+          text: 'What is a "phishing" attack?',
+          options: [
+            'A virus that deletes all your files',
+            'Hacking into a bank server',
+            'A fraudulent attempt to steal sensitive info by pretending to be a trustworthy source',
+            'Using a computer to catch fish'
+          ],
+          correctIndex: 2
+        },
+        {
+          id: 'q_sec_04',
+          text: 'What does Two-Factor Authentication (2FA) add to your account security?',
+          options: [
+            'It makes your password twice as long',
+            'It requires a second form of verification (like a code) in addition to your password',
+            'It allows two people to use the account',
+            'It removes the need for a password'
+          ],
+          correctIndex: 1
+        },
+        {
+          id: 'q_sec_05',
+          text: 'What is your "digital footprint"?',
+          options: [
+            'The physical size of your laptop',
+            'The trail of data you leave behind while using the internet',
+            'The number of steps you take while holding your phone',
+            'A secure boot drive'
+          ],
+          correctIndex: 1
+        },
+        {
+          id: 'q_sec_06',
+          text: 'Which action is generally UNSAFE on public Wi-Fi?',
+          options: [
+            'Reading news articles',
+            'Checking the weather',
+            'Logging into your bank account without a VPN',
+            'Searching for a recipe'
+          ],
+          correctIndex: 2
+        },
+        {
+          id: 'q_sec_07',
+          text: 'What does "HTTPS" in a website URL indicate?',
+          options: [
+            'Hyper Text Transfer Protocol Secure - communication is encrypted',
+            'High Tech Transfer Speed - the site loads faster',
+            'Home Text Type System - it is a personal blog',
+            'HTML Text Transfer Protocol Source - open source code'
+          ],
+          correctIndex: 0
+        },
+        {
+          id: 'q_sec_08',
+          text: 'What is "ransomware"?',
+          options: [
+            'Free software that runs ads',
+            'Malware that locks your data and demands payment to release it',
+            'Software used to track stolen laptops',
+            'An antivirus program'
+          ],
+          correctIndex: 1
+        },
+        {
+          id: 'q_sec_09',
+          text: 'What is "social engineering"?',
+          options: [
+            'Building social media apps',
+            'Manipulating people into giving up confidential information',
+            'Engineers working together in a team',
+            'Organizing social events online'
+          ],
+          correctIndex: 1
+        },
+        {
+          id: 'q_sec_10',
+          text: 'What should you do if you receive a suspicious email with an attachment?',
+          options: [
+            'Open the attachment to see what it is',
+            'Reply and ask if it is real',
+            'Forward it to all your friends',
+            'Do not open it; report it as spam or delete it'
+          ],
+          correctIndex: 3
+        },
+        {
+          id: 'q_sec_11',
+          text: 'Which of these is a good practice for digital citizenship?',
+          options: [
+            'Sharing fake news without checking',
+            'Bullying others anonymously',
+            'Respecting others\' privacy and copyright',
+            'Downloading pirated movies'
+          ],
+          correctIndex: 2
+        },
+        {
+          id: 'q_sec_12',
+          text: 'What is a "firewall"?',
+          options: [
+            'A wall behind your computer to prevent overheating',
+            'A security system that monitors and controls incoming and outgoing network traffic',
+            'Software that burns viruses',
+            'A physical lock on the server room'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
   },
   {
     course_id: 'tech_office',
@@ -268,7 +404,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Privacy', 'Social Media', 'Safety'],
     status: 'active',
-    simulationId: 'sim_cyber_phishing', // Fits security theme
+    simulationId: 'cyber-lab', // Fits security theme
     modules: createMockModules('Digital Privacy', 10),
     quiz: createMockQuiz('Digital Privacy')
   },
@@ -507,11 +643,39 @@ export const GALLERY_DATA: GalleryItem[] = [
   {
     id: 'gallery_01',
     schoolName: "Innovate High School",
-    description: "Cybersecurity workshop for Grade 11 students.",
+    description: "Cybersecurity bootcamp for Grade 11 students.",
     marqueeImageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop",
-    eventCategory: "Workshop",
+    eventCategory: "Sessions",
     detailImageUrls: [
       "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    id: 'gallery_02',
+    schoolName: "Geniusphere Tech Day",
+    description: "Annual tech showcase with student projects.",
+    marqueeImageUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
+    eventCategory: "Sessions",
+    detailImageUrls: [
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    id: 'gallery_03',
+    schoolName: "Vignan Public High School",
+    description: "Debate Competition: Juniors vs Seniors.",
+    marqueeImageUrl: "/images/vignan-debate/vignan-debate-01.jpg",
+    eventCategory: "Debate Events",
+    detailImageUrls: [
+      "/images/vignan-debate/vignan-debate-01.jpg",
+      "/images/vignan-debate/vignan-debate-02.jpg",
+      "/images/vignan-debate/vignan-debate-03.jpg",
+      "/images/vignan-debate/vignan-debate-04.jpg",
+      "/images/vignan-debate/vignan-debate-05.jpg",
+      "/images/vignan-debate/vignan-debate-06.jpg",
+      "/images/vignan-debate/vignan-debate-07.jpg",
+      "/images/vignan-debate/vignan-debate-08.jpg",
+      "/images/vignan-debate/vignan-debate-09.jpg"
     ]
   }
 ];
