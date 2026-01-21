@@ -2,18 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Global variable to capture the event before the component mounts
+let deferredPrompt: any = null;
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        console.log("Global beforeinstallprompt captured", e);
+    });
+}
+
 export const InstallPWA = () => {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [installEvent, setInstallEvent] = useState<any>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
+    const [showManualInstructions, setShowManualInstructions] = useState(false);
 
     useEffect(() => {
+        // Init: Check if we already have a deferred prompt from the global listener
+        if (deferredPrompt) {
+            setInstallEvent(deferredPrompt);
+            setShowInstallPrompt(true);
+        }
+
+        // Also update our local state if the event fires after mount
+        const handleBeforeInstallPrompt = (e: any) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setInstallEvent(e);
+            setShowInstallPrompt(true);
+            setShowManualInstructions(false); // If we have the event, we don't need manual instructions yet
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
         // Check if already in standalone mode
         const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
         setIsStandalone(isStandaloneMode);
 
-        if (isStandaloneMode) return;
+        if (isStandaloneMode) {
+            console.log("App is in standalone mode");
+            return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        }
 
         // iOS Detection
         const userAgent = window.navigator.userAgent.toLowerCase();
@@ -21,37 +55,39 @@ export const InstallPWA = () => {
         setIsIOS(isIosDevice);
 
         if (isIosDevice) {
-            // Show prompt for iOS users after a small delay
-            // Show prompt for iOS users after a small delay
-            // Removed permanent localStorage check to ensure it shows for testing/fixing
+            console.log("iOS device detected");
             setTimeout(() => setShowInstallPrompt(true), 3000);
         } else {
-            // Standard PWA (Android/Desktop)
-            const handler = (e: any) => {
-                e.preventDefault();
-                setDeferredPrompt(e);
-                setShowInstallPrompt(true);
-            };
-            window.addEventListener('beforeinstallprompt', handler);
-            return () => window.removeEventListener('beforeinstallprompt', handler);
+            // For Android/Desktop: If the event doesn't fire quickly (e.g. strict privacy, or not eligible yet),
+            // we still want to show the popup to tell them HOW to install if they want to.
+            // But we only show manual instructions if we don't get the event.
+            setTimeout(() => {
+                // Check deferredPrompt from the global scope, as state might be stale in closure
+                if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+                    setShowInstallPrompt(true);
+                    setShowManualInstructions(true);
+                }
+            }, 4000);
         }
+
+        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     }, []);
 
     const handleInstallClick = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        if (!installEvent) {
+            // Fallback if button clicked but lost event (unlikely due to UI logic, but safe)
+            return;
+        }
+        installEvent.prompt();
+        const { outcome } = await installEvent.userChoice;
         console.log(`User response to the install prompt: ${outcome}`);
-        setDeferredPrompt(null);
+        setInstallEvent(null);
+        deferredPrompt = null;
         setShowInstallPrompt(false);
     };
 
     const handleClose = () => {
         setShowInstallPrompt(false);
-        // Removed permanent setting to allow testing
-        // if (isIOS) {
-        //    sessionStorage.setItem('ios_install_prompt_seen', 'true'); // Optional: Use session storage instead
-        // }
     };
 
     if (isStandalone) return null;
@@ -77,7 +113,7 @@ export const InstallPWA = () => {
                             <div className="flex-1">
                                 <h3 className="font-bold text-white text-sm">Install Geniusphere</h3>
                                 <p className="text-slate-400 text-xs mt-1">
-                                    {isIOS ? "Install specifically for iOS" : "Add to Home Screen for better experience"}
+                                    {isIOS ? "Install for iOS" : "Add to Home Screen"}
                                 </p>
                             </div>
 
@@ -89,14 +125,26 @@ export const InstallPWA = () => {
                             </button>
                         </div>
 
-                        {/* IOS Specific Instructions */}
+                        {/* Instructions or Button */}
                         {isIOS ? (
                             <div className="text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg border border-white/5">
                                 <p className="mb-2 flex items-center gap-2">
-                                    1. Tap the <span className="font-bold text-blue-400">Share</span> button <span className="inline-block"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg></span>
+                                    1. Tap <span className="font-bold text-blue-400">Share</span> <span className="inline-block"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg></span>
                                 </p>
                                 <p className="flex items-center gap-2">
-                                    2. Select <span className="font-bold text-white">Add to Home Screen</span> (Scroll down)
+                                    2. Select <span className="font-bold text-white">Add to Home Screen</span>
+                                </p>
+                            </div>
+                        ) : showManualInstructions ? (
+                            <div className="text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg border border-white/5">
+                                <p className="mb-2 flex items-center gap-2">
+                                    To install via browser menu:
+                                </p>
+                                <p className="flex items-center gap-2 mb-1">
+                                    1. Tap the <span className="font-bold text-white">⋯</span> (Menu) button.
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    2. Select <span className="font-bold text-white">Install App</span> or <span className="font-bold text-white">Add to Home screen</span>.
                                 </p>
                             </div>
                         ) : (
