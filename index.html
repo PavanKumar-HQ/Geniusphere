@@ -117,6 +117,30 @@
       background-size: 50px 50px;
       mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
     }
+
+    /* Mobile Lab Optimizations */
+    @media (max-width: 768px) {
+
+      /* Make lab content scrollable horizontally on mobile */
+      .lab-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Ensure minimum width for lab content */
+      .lab-content {
+        min-width: 100%;
+      }
+
+      /* Hide or minimize sidebars on very small screens */
+      @media (max-width: 640px) {
+
+        /* Allow horizontal scrolling for wide lab layouts */
+        body {
+          overflow-x: auto !important;
+        }
+      }
+    }
   </style>
   <script type="importmap">
     {

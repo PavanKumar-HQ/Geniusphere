@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Moon, Sun, Globe, BookOpen, X } from 'lucide-react';
-import { LearningMood } from './ZenHub';
+import { LearningMood } from '../types';
 
 interface SessionManagerProps {
     currentMood: LearningMood;

@@ -9,6 +9,47 @@ import {
     Award, Download, User, Smartphone, Globe, Lightbulb, Lock, Thermometer, Calendar, Clock,
     Terminal, RefreshCw, Layers, MousePointer2
 } from 'lucide-react';
+import { UniversalLab } from './lab/UniversalLab';
+import { LAB_CONFIGS } from './lab/LabData';
+import { TEACHING_LAB_CONFIGS } from './lab/TeachingLabData';
+import { STUDENT_LAB_CONFIGS } from './lab/StudentLabData';
+import AiLabApp from '../labs/geniusphere-ai-lab/App';
+import BankingLabApp from '../labs/banking-accounts-lab/App';
+import CommunicationLabApp from '../labs/communication-pro_-interactive-lab/App';
+import ProfessionalSkillsLabApp from '../labs/professional-skills-lab_-how-success-really-works/App';
+import SocialProfileLabApp from '../labs/social-profile-development-lab/App';
+import FintechLabApp from '../labs/fintech-discovery-lab/App';
+import StockMarketLabApp from '../labs/stock-market-basics---interactive-lab/App';
+import GlobalEconomyLabApp from '../labs/global-economics-simulation-lab/App';
+import CryptoLabApp from '../labs/cryptolab_-how-digital-money-works/App';
+import IntroFinanceLabApp from '../labs/introduction-to-finance-lab/App';
+import DigitalPrivacyLabApp from '../labs/digital-privacy-&-footprint-lab/App';
+import IoTLabApp from '../labs/iot-cybersecurity-lab/App';
+import BlockchainLabApp from '../labs/trustlink-blockchain-lab/App';
+import MicrosoftOfficeLabApp from '../labs/microsoft-office---real-world-skills-lab/App';
+import { X } from 'lucide-react';
+
+const LabWrapper: React.FC<{
+    children: React.ReactNode,
+    onClose: () => void,
+    bg?: string
+}> = ({ children, onClose, bg = "bg-slate-950" }) => (
+    <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className={`fixed inset-0 z-[1001] ${bg} h-screen w-screen overflow-y-auto`}
+    >
+        <div className="fixed top-4 right-4 z-[999999] pointer-events-auto">
+            <button
+                onClick={(e) => { e.stopPropagation(); onClose(); }}
+                className="p-3 bg-slate-800 hover:bg-red-600 text-white rounded-full transition-all shadow-2xl active:scale-95 border border-white/10"
+                title="Exit Simulation"
+            >
+                <X size={24} />
+            </button>
+        </div>
+        {children}
+    </motion.div>
+);
 
 const motion = motionBase as any;
 
@@ -872,11 +913,248 @@ export const InteractiveLearning: React.FC<InteractiveLearningProps> = ({ simula
     const [currentChapterIndex, setCurrentChapterIndex] = React.useState(0);
     const [quizAnswer, setQuizAnswer] = React.useState<number | null>(null);
 
+    // Check if this ID exists in the new Lab Ecosystem
+    const isNewSystemLab = !!(LAB_CONFIGS[simulationId] || TEACHING_LAB_CONFIGS[simulationId] || STUDENT_LAB_CONFIGS[simulationId]);
+
+    const [isReady, setIsReady] = useState(false);
+
+    // Handle Mobile Back Button interaction
     React.useEffect(() => {
-        setModuleData(getModule(simulationId));
-        setCurrentChapterIndex(0);
-        setQuizAnswer(null);
-    }, [simulationId]);
+        // Push state to enable back button closing
+        if (window.history.state?.labOpen !== true) {
+            window.history.pushState({ labOpen: true }, '', window.location.href);
+        }
+
+        const handlePopState = (event: PopStateEvent) => {
+            // When user hits back, close lab
+            onClose();
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+
+    // Unified Loading & Initialization
+    React.useEffect(() => {
+        const timer = setTimeout(() => setIsReady(true), 1200);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Show loading screen for ALL labs (overrides + universal)
+    if (!isReady) {
+        return (
+            <div className="fixed inset-0 z-[9999] bg-[#070B1A] flex items-center justify-center">
+                {/* Emergency Exit Button (Available during loading) */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    style={{ zIndex: 10000, pointerEvents: 'auto' }}
+                    className="block fixed top-4 right-4 bg-slate-800/50 hover:bg-red-600/50 text-white/50 hover:text-white p-2 rounded-full transition-all border border-white/5 shadow-2xl active:scale-90"
+                    title="Cancel Loading"
+                    aria-label="Cancel Loading"
+                >
+                    <X size={20} />
+                </button>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center gap-6"
+                >
+                    <div className="relative">
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="w-20 h-20 rounded-full border-2 border-cyan-500/20 border-t-cyan-500"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Activity size={32} className="text-cyan-500 animate-pulse" />
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="text-cyan-500 font-black text-xs tracking-[0.5em] uppercase animate-pulse">Initializing_Session</div>
+                        <div className="text-white/20 text-[10px] font-mono tracking-widest uppercase">Encryption_Active // v4.3</div>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
+
+    // --- OVERRIDES FOR SPECIAL HIGH-FIDELITY LABS ---
+    // AI Lab Override
+    if (simulationId === 'sim_ai_neural') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-slate-950">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <AiLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Banking Lab for Finance simulations
+    if (simulationId === 'sim_finance_budget') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <BankingLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Communication Lab for Soft Skills
+    if (simulationId === 'sim_soft_comm') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#0A0E1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <CommunicationLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Professional Skills Lab
+    if (simulationId === 'sim_prof_skills') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-gradient-to-br from-[#0B1220] to-[#111827]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <ProfessionalSkillsLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Social Profile Development Lab
+    if (simulationId === 'sim_social_profile') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#0B1220]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <SocialProfileLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Fintech Discovery Lab
+    if (simulationId === 'sim_fintech') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <FintechLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Stock Market Basics Lab
+    if (simulationId === 'sim_stock_market') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <StockMarketLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Global Economics Simulation Lab
+    if (simulationId === 'sim_global_economy') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <GlobalEconomyLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Cryptocurrency Deep Dive Lab
+    if (simulationId === 'sim_crypto') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#050816]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <CryptoLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Introduction to Finance Lab
+    if (simulationId === 'sim_intro_finance') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <IntroFinanceLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Digital Privacy & Footprint Lab
+    if (simulationId === 'sim_digital_privacy') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <DigitalPrivacyLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom IoT Cybersecurity Lab
+    if (simulationId === 'sim_iot_smart') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <IoTLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // Blockchain Lab Override (TrustLink)
+    if (simulationId === 'sim_blockchain_hash') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <BlockchainLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    // SPECIAL OVERRIDE: Use the custom Microsoft Office Real-World Skills Lab
+    if (simulationId === 'sim_office') {
+        return (
+            <LabWrapper onClose={onClose} bg="bg-[#070B1A]">
+                <div className="h-full w-full min-w-[320px] md:min-w-0">
+                    <MicrosoftOfficeLabApp onClose={onClose} />
+                </div>
+            </LabWrapper>
+        );
+    }
+
+    React.useEffect(() => {
+        if (!isNewSystemLab) {
+            setModuleData(getModule(simulationId));
+            setCurrentChapterIndex(0);
+            setQuizAnswer(null);
+        }
+    }, [simulationId, isNewSystemLab]);
+
+    if (isNewSystemLab) {
+        return <UniversalLab simulationId={simulationId} onClose={onClose} />;
+    }
 
     if (!moduleData) {
         return null;
@@ -912,7 +1190,7 @@ export const InteractiveLearning: React.FC<InteractiveLearningProps> = ({ simula
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 pt-4 md:pt-24 bg-slate-950/95 backdrop-blur-3xl flex flex-col"
+            className="fixed inset-0 z-[1000] pt-4 md:pt-24 bg-slate-950/95 backdrop-blur-3xl flex flex-col"
         >
             {/* Top Bar with Progress */}
             <div className="px-6 pb-6 border-b border-white/5 bg-black/20 shrink-0">
@@ -1038,6 +1316,16 @@ export const InteractiveLearning: React.FC<InteractiveLearningProps> = ({ simula
                         </motion.div>
                     ) : null}
                 </AnimatePresence>
+            </div>
+            <div className="fixed top-4 right-4 z-[999999] pointer-events-auto">
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    className="p-3 bg-slate-800 hover:bg-red-600 text-white rounded-full transition-all border border-white/10 shadow-2xl active:scale-90"
+                    title="Exit Lab"
+                    aria-label="Exit Lab"
+                >
+                    <X size={24} />
+                </button>
             </div>
         </motion.div>
     );

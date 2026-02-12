@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LabModule } from './LabTypes';
 import {
     Brain, Database, Server, Wifi, Smartphone, Globe, Shield, Lock,
-    Cpu, Cloud, DollarSign, PieChart, TrendingUp, Hash, Layers
+    Cpu, Cloud, DollarSign, PieChart, TrendingUp, Hash, Layers,
+    MessageSquare, Users, User, Smile, Frown, Sparkles, GraduationCap,
+    Lightbulb, Megaphone, Heart
 } from 'lucide-react';
 
 interface LabAnimationPlayerProps {
@@ -411,6 +413,163 @@ const IoTSensorView: React.FC<{ currentStep: number }> = ({ currentStep }) => {
     );
 }
 
+const ConversationView: React.FC<{ currentStep: number }> = ({ currentStep }) => {
+    // Step 0: Neutral/Listening
+    // Step 1: Speaking (One side)
+    // Step 2: Processing (Other side)
+    // Step 3: Understanding/Connection (Line connects)
+    // Step 4: Resolution (Both active)
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
+            <div className="flex items-center justify-between w-full max-w-lg relative z-10">
+                {/* Person A (Teacher/Speaker) */}
+                <div className="flex flex-col items-center gap-4">
+                    <motion.div
+                        animate={{ scale: currentStep === 1 || currentStep === 4 ? 1.1 : 1 }}
+                        className={`w-20 h-20 md:w-28 md:h-28 rounded-full border-4 flex items-center justify-center bg-slate-800 ${currentStep === 1 || currentStep === 4 ? 'border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'border-slate-600'}`}
+                    >
+                        <User size={40} className="text-white" />
+                    </motion.div>
+                    {currentStep === 1 && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="absolute -top-12 left-0 bg-white text-slate-900 px-3 py-1 rounded-t-xl rounded-br-xl text-xs font-bold">
+                            Speaking...
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Connection Waves */}
+                <div className="flex-1 px-4 flex justify-center items-center relative h-20">
+                    {/* Speech Bubbles / Waves */}
+                    {currentStep >= 1 && (
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: currentStep >= 3 ? '100%' : '50%' }}
+                            className={`h-2 rounded-full ${currentStep >= 3 ? 'bg-gradient-to-r from-indigo-500 to-emerald-500' : 'bg-indigo-500'}`}
+                        />
+                    )}
+                    {currentStep >= 3 && (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring" }}
+                            className="absolute -top-6 bg-emerald-500/20 text-emerald-400 p-2 rounded-full border border-emerald-500/50"
+                        >
+                            <Heart size={20} fill="currentColor" />
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Person B (Student/Listener) */}
+                <div className="flex flex-col items-center gap-4">
+                    <motion.div
+                        animate={{ scale: currentStep === 2 || currentStep === 4 ? 1.1 : 1 }}
+                        className={`w-20 h-20 md:w-28 md:h-28 rounded-full border-4 flex items-center justify-center bg-slate-800 ${currentStep >= 3 || currentStep === 4 ? 'border-emerald-400 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : 'border-slate-600'}`}
+                    >
+                        {currentStep >= 3 ? <Smile size={40} className="text-emerald-400" /> : <User size={40} className="text-slate-400" />}
+                    </motion.div>
+                    {currentStep === 2 && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="absolute -top-12 right-0 bg-slate-700 text-white px-3 py-1 rounded-t-xl rounded-bl-xl text-xs font-bold border border-white/20">
+                            Thinking...
+                        </motion.div>
+                    )}
+                </div>
+            </div>
+            <div className="text-slate-500 font-mono text-xs mt-12 tracking-widest text-center">
+                {currentStep === 0 ? "LISTENING MODE" : currentStep === 1 ? "TRANSMISSION" : currentStep === 2 ? "PROCESSING" : currentStep === 3 ? "CONNECTION" : "RESOLUTION"}
+            </div>
+        </div>
+    );
+}
+
+const ClassroomView: React.FC<{ currentStep: number }> = ({ currentStep }) => {
+    // Step 0: Teacher Focus
+    // Step 1: Content Distribution (Particles from teacher to students)
+    // Step 2: Student Processing (Students glow)
+    // Step 3: Interaction (Lines between students)
+    // Step 4: Mastery (All green)
+
+    return (
+        <div className="w-full h-full flex flex-col items-center pt-8 pb-16 relative overflow-hidden">
+            {/* Teacher */}
+            <motion.div
+                className="z-20 flex flex-col items-center mb-8 relative"
+                animate={{ scale: currentStep === 0 ? 1.1 : 1 }}
+            >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-xl border border-white/20">
+                    <GraduationCap size={32} className="text-white" />
+                </div>
+                {/* Content Emission */}
+                {currentStep === 1 && (
+                    <motion.div
+                        initial={{ scale: 1, opacity: 1 }}
+                        animate={{ scale: 3, opacity: 0 }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="absolute inset-0 rounded-full border border-purple-400"
+                    />
+                )}
+            </motion.div>
+
+            {/* Students Grid */}
+            <div className="grid grid-cols-3 gap-8 md:gap-16 z-10">
+                {[1, 2, 3, 4, 5, 6].map((i) => {
+                    // Logic for different states per student to simulate variety
+                    const isProcessing = currentStep === 2;
+                    const isInteracting = currentStep === 3;
+                    const isMastered = currentStep === 4;
+                    const delay = i * 0.1;
+
+                    return (
+                        <motion.div
+                            key={i}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay }}
+                            className="relative"
+                        >
+                            <motion.div
+                                animate={{
+                                    backgroundColor: isMastered ? '#10b981' : isProcessing ? '#f59e0b' : '#1e293b',
+                                    y: isProcessing ? [0, -5, 0] : 0
+                                }}
+                                transition={{ y: { repeat: Infinity, duration: 1 + (i * 0.2) } }}
+                                className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center"
+                            >
+                                <User size={20} className={isMastered ? 'text-white' : 'text-slate-400'} />
+                            </motion.div>
+
+                            {/* Interaction Lines */}
+                            {isInteracting && i % 2 !== 0 && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: 60, opacity: 1 }}
+                                    className="absolute top-1/2 left-full h-0.5 bg-cyan-400/50"
+                                />
+                            )}
+
+                            {isMastered && (
+                                <motion.div
+                                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                    className="absolute -top-1 -right-1 bg-white text-green-600 rounded-full p-0.5"
+                                >
+                                    <Sparkles size={10} />
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    )
+                })}
+            </div>
+
+            {/* Connecting lines from teacher to center */}
+            {currentStep >= 1 && (
+                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20 z-0">
+                    <line x1="50%" y1="15%" x2="50%" y2="50%" stroke="white" strokeWidth="2" strokeDasharray="4 4" />
+                </svg>
+            )}
+        </div>
+    );
+}
+
 // --- Main Component ---
 
 export const LabAnimationPlayer: React.FC<LabAnimationPlayerProps> = ({ module, currentStep, isPlaying }) => {
@@ -429,6 +588,10 @@ export const LabAnimationPlayer: React.FC<LabAnimationPlayerProps> = ({ module, 
                 return <HashingView currentStep={currentStep} />;
             case 'iot_sensor':
                 return <IoTSensorView currentStep={currentStep} />;
+            case 'conversation':
+                return <ConversationView currentStep={currentStep} />;
+            case 'classroom':
+                return <ClassroomView currentStep={currentStep} />;
             case 'process_flow':
             default:
                 return <ProcessFlowView currentStep={currentStep} steps={animationSteps} icon={module.icon} />;

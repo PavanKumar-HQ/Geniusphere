@@ -1,14 +1,12 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import {
     Bell, Lock, User, Video, Image as ImageIcon, Layout, Library, Plus, Trash2,
     BookOpen, CheckCircle, Clock, Save, Edit, X, FileText, MessageCircle, HelpCircle,
     List, Calendar, PieChart, Activity, Users, School, GraduationCap, Play, LogOut, Loader2,
-    LayoutGrid, Settings, Search, BarChart3, Megaphone, Trophy, Download
+    LayoutGrid, Settings, Search, BarChart3, Megaphone, Trophy, Download, Sparkles, Brain, Shield, Globe, Copy, Menu
 } from 'lucide-react';
 import { motion as motionBase, AnimatePresence } from 'framer-motion';
+// Removed resource imports
 import {
     VideoResource, SectorType, GalleryItem, FAQItem, VideoTestimonial, Student,
     EducationalResource, ResourceType, TestimonialCategory, CurriculumItem, PlanStatus, Course, Trainer, Ambassador
@@ -16,6 +14,10 @@ import {
 import { ACTION_PLAN_DATA } from '../constants';
 import { CourseBuilder } from './CourseBuilder';
 import { DailyWisdom } from './DailyWisdom';
+import { TeachingHubSection } from './TeachingHubSection';
+import { ClaritySection } from './ClaritySection';
+
+
 
 const motion = motionBase as any;
 
@@ -37,19 +39,38 @@ interface DashboardPreviewProps {
     ambassadors: Ambassador[];
     setAmbassadors: React.Dispatch<React.SetStateAction<Ambassador[]>>;
     onSwitchMode: () => void;
+    mode?: 'admin' | 'teacher';
 }
 
 export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     videos, setVideos, galleryData, setGalleryData, faqs, setFaqs, testimonials, setTestimonials,
-    trainers, setTrainers, resources, setResources, courses, setCourses, ambassadors, setAmbassadors, onSwitchMode
+    trainers, setTrainers, resources, setResources, courses, setCourses, ambassadors, setAmbassadors, onSwitchMode, mode = 'admin'
 }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
     // Tabs
-    const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'trainers' | 'courses' | 'resources' | 'ambassadors'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'trainers' | 'courses' | 'resources' | 'ambassadors' | 'teaching-hub' | 'awareness' | 'tools'>('overview');
     const [activeSubTab, setActiveSubTab] = useState<'video' | 'blog' | 'ebook' | 'gallery' | 'faqs' | 'reviews'>('video');
+
+    // Realtime Analytics State
+    const [statsData, setStatsData] = useState({
+        revenue: '$24,500',
+        students: '1,234',
+        courses: String(courses?.length || 0),
+        trainers: String(trainers?.length || 0)
+    });
+
+    // Reset tab when mode changes
+    useEffect(() => {
+        if (mode === 'teacher') {
+            setActiveTab('teaching-hub');
+        } else {
+            setActiveTab('overview');
+        }
+    }, [mode]);
 
     // New Feature Data
     const [curriculumItems, setCurriculumItems] = useState<CurriculumItem[]>(ACTION_PLAN_DATA);
@@ -96,10 +117,17 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
     // Welcome Popup State
     const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
+    // Teacher Hub State - Moved to specialized components (TeachingHubSection, ClaritySection)
+
     const handleLogin = () => {
-        if (password === "geniusphere1231") {
+        const adminPass = "geniusphere1231";
+        const teacherPass = "teacher123";
+
+        if (mode === 'admin' && password === adminPass) {
             setIsAuthenticated(true);
-            setShowWelcomePopup(true);
+            setError("");
+        } else if (mode === 'teacher' && password === teacherPass) {
+            setIsAuthenticated(true);
             setError("");
         } else {
             setError("Incorrect password.");
@@ -263,7 +291,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
                         <Lock size={32} className="text-cyan-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Admin Dashboard</h2>
+                    <h2 className="text-2xl font-bold text-white mb-2">{mode === 'admin' ? 'Admin Dashboard' : 'Teacher Dashboard'}</h2>
                     <p className="text-slate-400 text-sm mb-6">Enter secure access code to manage platform.</p>
                     <input
                         type="password"
@@ -282,7 +310,14 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
 
     // --- DASHBOARD LAYOUT ---
     return (
-        <div className="min-h-screen bg-slate-950 text-white flex overflow-hidden font-sans">
+        <div className="min-h-screen text-white flex overflow-hidden font-sans relative">
+            {/* Glassmorphism Background */}
+            <div className="fixed inset-0 z-0 bg-[#0a0e1a]">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-950/40 via-[#0a0e1a] to-[#0a0e1a]" />
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/8 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-blue-600/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+            </div>
 
             {/* Course Builder Modal */}
             <AnimatePresence>
@@ -296,21 +331,19 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
             </AnimatePresence>
 
             {/* --- SIDEBAR --- */}
-            <aside className="w-64 bg-slate-900/80 backdrop-blur-xl border-r border-white/5 flex-col hidden md:flex">
-                <div className="p-6 border-b border-white/5">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <span className="font-bold">G</span>
-                        </div>
-                        <span className="font-bold text-lg">Geniusphere</span>
+            <aside className="w-64 bg-white/[0.03] backdrop-blur-2xl border-r border-white/10 flex-col hidden md:flex relative z-10">
+                <div className="p-6 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                        <img src="/geniusphere-logo.jpg" alt="Geniusphere" className={`w-10 h-10 rounded-xl object-cover shadow-lg ${mode === 'teacher' ? 'shadow-purple-500/40 brightness-110 saturate-150 hue-rotate-15' : 'shadow-blue-500/20'}`} />
+                        <span className="font-bold text-lg bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Geniusphere</span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-2">Admin Console v2.0</p>
+                    <p className="text-xs text-slate-500 mt-2">{mode === 'admin' ? 'Admin Console v2.0' : 'Teacher Console v1.0'}</p>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Main Menu</div>
 
-                    {[
+                    {mode === 'admin' ? [
                         { id: 'overview', icon: LayoutGrid, label: 'Dashboard' },
                         { id: 'courses', icon: BookOpen, label: 'Course Catalog' },
                         { id: 'curriculum', icon: List, label: 'Curriculum Plan' },
@@ -323,6 +356,21 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                             onClick={() => setActiveTab(item.id as any)}
                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${activeTab === item.id
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 font-medium'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <item.icon size={18} />
+                            <span>{item.label}</span>
+                        </button>
+                    )) : [
+                        { id: 'teaching-hub', icon: MessageCircle, label: 'Teaching Hub' },
+                        { id: 'awareness', icon: Shield, label: 'Awareness Topics' },
+                    ].map(item => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id as any)}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${activeTab === item.id
+                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20 font-medium'
                                 : 'text-slate-400 hover:text-white hover:bg-white/5'
                                 }`}
                         >
@@ -342,12 +390,86 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                 </div>
             </aside>
 
+            {/* --- MOBILE SIDEBAR DRAWER --- */}
+            <AnimatePresence>
+                {isMobileNavOpen && (
+                    <>
+                        <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm md:hidden" onClick={() => setIsMobileNavOpen(false)} />
+                        <motion.aside
+                            initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}
+                            className="fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] border-r border-white/10 flex flex-col md:hidden shadow-2xl shadow-black/80"
+                        >
+                            <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <img src="/geniusphere-logo.jpg" alt="Geniusphere" className={`w-10 h-10 rounded-xl object-cover shadow-lg ${mode === 'teacher' ? 'shadow-purple-500/40 brightness-110 saturate-150 hue-rotate-15' : 'shadow-blue-500/20'}`} />
+                                    <span className="font-bold text-lg text-white">Geniusphere</span>
+                                </div>
+                                <button onClick={() => setIsMobileNavOpen(false)} className="text-slate-400 hover:text-white"><X size={20} /></button>
+                            </div>
+
+                            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Main Menu</div>
+
+                                {mode === 'admin' ? [
+                                    { id: 'overview', icon: LayoutGrid, label: 'Dashboard' },
+                                    { id: 'courses', icon: BookOpen, label: 'Course Catalog' },
+                                    { id: 'curriculum', icon: List, label: 'Curriculum Plan' },
+                                    { id: 'trainers', icon: Users, label: 'Trainers' },
+                                    { id: 'ambassadors', icon: Trophy, label: 'Ambassadors' },
+                                    { id: 'resources', icon: Library, label: 'Resource Library' },
+                                ].map(item => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => { setActiveTab(item.id as any); setIsMobileNavOpen(false); }}
+                                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${activeTab === item.id
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 font-medium'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        <item.icon size={18} />
+                                        <span>{item.label}</span>
+                                    </button>
+                                )) : [
+                                    { id: 'teaching-hub', icon: MessageCircle, label: 'Teaching Hub' },
+                                    { id: 'awareness', icon: Shield, label: 'Awareness Topics' },
+                                    // { id: 'tools', icon: Settings, label: 'Teacher Tools' },
+                                ].map(item => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => { setActiveTab(item.id as any); setIsMobileNavOpen(false); }}
+                                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${activeTab === item.id
+                                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20 font-medium'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        <item.icon size={18} />
+                                        <span>{item.label}</span>
+                                    </button>
+                                ))}
+                            </nav>
+
+                            <div className="p-4 border-t border-white/5">
+                                <button onClick={onSwitchMode} className="w-full flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors text-sm mb-2">
+                                    <Layout size={16} /> Student View
+                                </button>
+                                <button onClick={() => setIsAuthenticated(false)} className="w-full flex items-center gap-3 px-3 py-3 text-red-400 hover:text-white hover:bg-red-500/20 rounded-xl transition-colors text-sm">
+                                    <LogOut size={16} /> Sign Out
+                                </button>
+                            </div>
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
+
             {/* --- MAIN CONTENT --- */}
-            <main className="flex-1 flex flex-col h-screen overflow-hidden">
+            < main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10" >
                 {/* Top Header */}
-                <header className="h-16 border-b border-white/5 bg-slate-900/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
-                    <div className="md:hidden flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold">G</div>
+                <header className="h-16 border-b border-white/10 bg-white/[0.02] backdrop-blur-2xl flex items-center justify-between px-6 shrink-0 z-20 relative">
+                    <div className="md:hidden flex items-center gap-3">
+                        <button onClick={() => setIsMobileNavOpen(true)} className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+                            <Menu size={24} />
+                        </button>
+                        <img src="/geniusphere-logo.jpg" alt="Geniusphere" className={`w-8 h-8 rounded-lg object-cover ${mode === 'teacher' ? 'brightness-110 saturate-150 hue-rotate-15' : ''}`} />
                     </div>
 
                     {/* Breadcrumbs or Search */}
@@ -367,20 +489,21 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                         </div>
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400"></div>
                     </div>
-                </header>
+                </header >
 
                 {/* Content Scroll Area */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                < div className="flex-1 overflow-y-auto custom-scrollbar p-6" >
                     <AnimatePresence mode="wait">
 
                         {activeTab === 'overview' && (
                             <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {[
-                                        { label: 'Total Revenue', value: '$24,500', trend: '+12%', color: 'text-green-400', icon: BarChart3 },
-                                        { label: 'Active Students', value: '1,234', trend: '+5%', color: 'text-blue-400', icon: Users },
-                                        { label: 'Courses Active', value: courses.length, trend: 'stable', color: 'text-purple-400', icon: BookOpen },
-                                        { label: 'Trainers', value: trainers.length, trend: 'new', color: 'text-orange-400', icon: GraduationCap },
+                                        // Only show Revenue for Admin
+                                        ...(mode === 'admin' ? [{ label: 'Total Revenue', value: statsData.revenue, trend: '+12%', color: 'text-green-400', icon: BarChart3 }] : []),
+                                        { label: 'Active Students', value: statsData.students, trend: '+5%', color: 'text-blue-400', icon: Users },
+                                        { label: 'Courses Active', value: statsData.courses, trend: 'stable', color: 'text-purple-400', icon: BookOpen },
+                                        { label: 'Trainers', value: statsData.trainers, trend: 'new', color: 'text-orange-400', icon: GraduationCap },
                                     ].map((stat, i) => (
                                         <div key={i} className="p-6 bg-slate-800/40 border border-white/5 rounded-2xl hover:bg-slate-800/60 transition-colors">
                                             <div className="flex justify-between items-start mb-4">
@@ -394,54 +517,70 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    {/* Career Path Tracker */}
+                                    {/* Realtime Analytics Console */}
                                     <div className="lg:col-span-2 p-6 bg-slate-900/50 rounded-2xl border border-white/5">
                                         <div className="flex justify-between items-center mb-6">
                                             <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                                <Activity size={20} className="text-blue-400" /> Career Path Tracker
+                                                <Activity size={20} className="text-cyan-400" /> Realtime Analytics Console
                                             </h3>
-                                            <button className="text-xs text-blue-400 hover:text-white transition-colors">Change Goal</button>
+                                            <span className="flex items-center gap-2 text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded-full animate-pulse">
+                                                <div className="w-2 h-2 rounded-full bg-green-500"></div> Live Data
+                                            </span>
                                         </div>
 
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-500/20">
-                                                FE
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                                <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                                                    <label className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2 block">System Metrics</label>
+                                                    <div className="space-y-3">
+                                                        {mode === 'admin' && (
+                                                            <div>
+                                                                <div className="flex justify-between text-xs mb-1"><span className="text-slate-400">Total Revenue</span> <span className="text-green-400">{statsData.revenue}</span></div>
+                                                                <input
+                                                                    type="text"
+                                                                    value={statsData.revenue}
+                                                                    onChange={(e) => setStatsData({ ...statsData, revenue: e.target.value })}
+                                                                    className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-green-500 focus:bg-slate-800 transition-all outline-none"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <div className="flex justify-between text-xs mb-1"><span className="text-slate-400">Active Students</span> <span className="text-blue-400">{statsData.students}</span></div>
+                                                            <input
+                                                                type="text"
+                                                                value={statsData.students}
+                                                                onChange={(e) => setStatsData({ ...statsData, students: e.target.value })}
+                                                                className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:bg-slate-800 transition-all outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1">Target Role</div>
-                                                <div className="text-2xl font-bold text-white">Senior Frontend Engineer</div>
-                                            </div>
-                                            <div className="ml-auto text-right">
-                                                <div className="text-3xl font-bold text-blue-400">40%</div>
-                                                <div className="text-xs text-slate-500">Completed</div>
-                                            </div>
-                                        </div>
 
-                                        {/* Progress Bar */}
-                                        <div className="h-4 bg-slate-800 rounded-full overflow-hidden mb-6 border border-white/5 relative group">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: '40%' }}
-                                                transition={{ duration: 1.5, ease: "easeOut" }}
-                                                className="h-full bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] animate-shimmer"
-                                            />
-                                            {/* Milestones */}
-                                            <div className="absolute top-0 left-[20%] h-full w-0.5 bg-slate-900/50" title="Junior Dev"></div>
-                                            <div className="absolute top-0 left-[60%] h-full w-0.5 bg-slate-900/50" title="Mid-Level"></div>
-                                        </div>
-
-                                        <div className="grid grid-cols-3 gap-4">
-                                            <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
-                                                <div className="text-xs text-green-400 font-bold mb-1">Acquired</div>
-                                                <div className="text-white font-bold">React, TS</div>
-                                            </div>
-                                            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center">
-                                                <div className="text-xs text-blue-400 font-bold mb-1">In Progress</div>
-                                                <div className="text-white font-bold">Next.js</div>
-                                            </div>
-                                            <div className="p-3 rounded-xl bg-slate-800 border border-white/5 text-center opacity-60">
-                                                <div className="text-xs text-slate-400 font-bold mb-1">Next Up</div>
-                                                <div className="text-slate-300">System Design</div>
+                                            <div className="space-y-4">
+                                                <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                                                    <label className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2 block">Content Metrics</label>
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <div className="flex justify-between text-xs mb-1"><span className="text-slate-400">Active Courses</span> <span className="text-purple-400">{statsData.courses}</span></div>
+                                                            <input
+                                                                type="text"
+                                                                value={statsData.courses}
+                                                                onChange={(e) => setStatsData({ ...statsData, courses: e.target.value })}
+                                                                className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:bg-slate-800 transition-all outline-none"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex justify-between text-xs mb-1"><span className="text-slate-400">Trainers</span> <span className="text-orange-400">{statsData.trainers}</span></div>
+                                                            <input
+                                                                type="text"
+                                                                value={statsData.trainers}
+                                                                onChange={(e) => setStatsData({ ...statsData, trainers: e.target.value })}
+                                                                className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500 focus:bg-slate-800 transition-all outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -467,17 +606,20 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                                     </div>
                                 </div>
 
-                                {/* Motivational Quote Banner */}
-                                <div className="relative p-8 rounded-3xl bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-white/5 flex items-center justify-between overflow-hidden">
-                                    <div className="relative z-10 max-w-2xl">
-                                        <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-2"><Trophy size={16} /> Daily Wisdom</h3>
-                                        <p className="text-2xl font-serif italic text-slate-200 leading-relaxed">"The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."</p>
-                                        <p className="text-sm text-slate-400 mt-3 font-bold uppercase tracking-widest">— Brian Herbert</p>
+
+                                {/* Motivational Quote Banner - Only for admin mode */}
+                                {mode === 'admin' && (
+                                    <div className="relative p-8 rounded-3xl bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-white/5 flex items-center justify-between overflow-hidden">
+                                        <div className="relative z-10 max-w-2xl">
+                                            <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-2"><Trophy size={16} /> Daily Wisdom</h3>
+                                            <p className="text-2xl font-serif italic text-slate-200 leading-relaxed">"The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice."</p>
+                                            <p className="text-sm text-slate-400 mt-3 font-bold uppercase tracking-widest">— Brian Herbert</p>
+                                        </div>
+                                        <div className="hidden md:block absolute right-10 top-1/2 -translate-y-1/2">
+                                            <Trophy size={180} className="text-indigo-500/10 rotate-12" />
+                                        </div>
                                     </div>
-                                    <div className="hidden md:block absolute right-10 top-1/2 -translate-y-1/2">
-                                        <Trophy size={180} className="text-indigo-500/10 rotate-12" />
-                                    </div>
-                                </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {/* Resume Builder Widget */}
@@ -745,6 +887,73 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                             </motion.div>
                         )}
 
+                        {activeTab === 'teaching-hub' && (
+                            <TeachingHubSection />
+                        )}
+
+                        {activeTab === 'awareness' && (
+                            <motion.div key="awareness" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <h2 className="text-2xl font-bold text-white mb-6">Awareness Topics</h2>
+                                <div className="space-y-8">
+                                    <section>
+                                        <h3 className="text-lg font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                                            <Shield size={18} className="text-red-400" /> Life & Safety
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {['Personal Safety', 'Emergency Response', 'Cyberbullying'].map((topic, i) => (
+                                                <div key={i} className="p-5 bg-red-900/10 border border-red-500/20 rounded-xl hover:bg-red-900/20 transition-colors">
+                                                    <h4 className="font-bold text-white mb-2">{topic}</h4>
+                                                    <button className="text-xs text-red-400 hover:text-white uppercase font-bold mt-2">View Guide →</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <h3 className="text-lg font-bold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                                            <Brain size={18} className="text-emerald-400" /> Emotional Well-being
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {['Stress Management', 'Digital Detox', 'Mindfulness'].map((topic, i) => (
+                                                <div key={i} className="p-5 bg-emerald-900/10 border border-emerald-500/20 rounded-xl hover:bg-emerald-900/20 transition-colors">
+                                                    <h4 className="font-bold text-white mb-2">{topic}</h4>
+                                                    <button className="text-xs text-emerald-400 hover:text-white uppercase font-bold mt-2">View Guide →</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </div>
+                            </motion.div>
+                        )}
+
+
+                        {activeTab === 'tools' && (
+                            <motion.div key="tools" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <h2 className="text-2xl font-bold text-white mb-6">Digital Tool Recommendations</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {[
+                                        { cat: 'Assessment', tools: ['Kahoot', 'Quizizz', 'Google Forms'] },
+                                        { cat: 'Presentation', tools: ['Canva', 'Prezi', 'SlidesAI'] },
+                                        { cat: 'Collaboration', tools: ['Miro', 'Notion', 'Padlet'] },
+                                        { cat: 'Content Creation', tools: ['Loom', 'Obsidian', 'Audacity'] }
+                                    ].map((category, i) => (
+                                        <div key={i} className="p-6 bg-slate-800/40 border border-white/5 rounded-2xl">
+                                            <h3 className="font-bold text-white mb-4 border-b border-white/5 pb-2">{category.cat}</h3>
+                                            <ul className="space-y-2">
+                                                {category.tools.map((tool, j) => (
+                                                    <li key={j} className="flex items-center gap-2 text-slate-400">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                                        {tool}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+
+                        )}
+
                         {activeTab === 'resources' && (
                             <motion.div key="resources" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                                 <div className="flex gap-2 mb-6 border-b border-white/5 pb-1">
@@ -821,11 +1030,11 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({
                         )}
 
                     </AnimatePresence>
-                </div>
-            </main>
+                </div >
+            </main >
 
-            {/* Welcome/Daily Wisdom Popup */}
-            <DailyWisdom isOpen={showWelcomePopup} onClose={() => setShowWelcomePopup(false)} />
-        </div>
+            {/* Welcome/Daily Wisdom Popup - Only show for student mode */}
+            {/* Note: This component is not shown for teacher/admin modes */}
+        </div >
     );
 };

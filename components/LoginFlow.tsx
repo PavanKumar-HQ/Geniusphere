@@ -5,13 +5,13 @@ import { GraduationCap, Brain, Shield, CheckCircle, ArrowRight, LayoutGrid, User
 const motion = motionBase as any;
 
 interface LoginFlowProps {
-  onComplete: (mode: 'explorer' | 'workspace') => void;
+  onComplete: (mode: 'explorer' | 'workspace' | 'teacher') => void;
 }
 
 export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
   const [step, setStep] = useState<'login' | 'mode'>('login');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<'explorer' | 'workspace' | null>(null);
+  const [selectedMode, setSelectedMode] = useState<'explorer' | 'workspace' | 'teacher' | null>(null);
 
   const handleLogin = () => {
     setIsLoading(true);
@@ -97,8 +97,8 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setSelectedMode('explorer')}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${selectedMode === 'explorer'
-                      ? 'bg-blue-500/20 border-cyanGlow ring-1 ring-cyanGlow'
-                      : 'bg-slate-800/50 border-white/10 hover:border-white/20'
+                    ? 'bg-blue-500/20 border-cyanGlow ring-1 ring-cyanGlow'
+                    : 'bg-slate-800/50 border-white/10 hover:border-white/20'
                     }`}
                 >
                   <div className="flex items-center gap-4 relative z-10">
@@ -113,13 +113,34 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                   </div>
                 </motion.div>
 
+                {/* Teacher Mode */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => setSelectedMode('teacher')}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${selectedMode === 'teacher'
+                    ? 'bg-purple-500/20 border-purple-400 ring-1 ring-purple-400'
+                    : 'bg-slate-800/50 border-white/10 hover:border-white/20'
+                    }`}
+                >
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center">
+                      <GraduationCap size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold">Teacher Mode</h3>
+                      <p className="text-xs text-slate-400">Manage classes and students.</p>
+                    </div>
+                    {selectedMode === 'teacher' && <CheckCircle className="ml-auto text-purple-400" size={20} />}
+                  </div>
+                </motion.div>
+
                 {/* Admin Dashboard */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setSelectedMode('workspace')}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${selectedMode === 'workspace'
-                      ? 'bg-emerald-500/20 border-softMint ring-1 ring-softMint'
-                      : 'bg-slate-800/50 border-white/10 hover:border-white/20'
+                    ? 'bg-emerald-500/20 border-softMint ring-1 ring-softMint'
+                    : 'bg-slate-800/50 border-white/10 hover:border-white/20'
                     }`}
                 >
                   <div className="flex items-center gap-4 relative z-10">
@@ -141,8 +162,8 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({ onComplete }) => {
                 whileTap={selectedMode ? { scale: 0.98 } : {}}
                 onClick={() => selectedMode && onComplete(selectedMode)}
                 className={`w-full mt-8 py-3.5 rounded-xl font-bold transition-all ${selectedMode
-                    ? 'bg-white text-midnight hover:shadow-lg hover:shadow-white/20'
-                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                  ? 'bg-white text-midnight hover:shadow-lg hover:shadow-white/20'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                   }`}
               >
                 Launch Platform

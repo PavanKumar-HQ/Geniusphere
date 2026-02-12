@@ -25,9 +25,9 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ items }) => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-             Kids Online Classes - <span className="text-softMint">Frequently Asked Questions</span>
-           </h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+            Kids Online Classes - <span className="text-softMint">Frequently Asked Questions</span>
+          </h2>
         </motion.div>
 
         <div className="space-y-4">
@@ -64,9 +64,9 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ items }) => {
                     className="overflow-hidden"
                   >
                     <div className="px-6 pb-6 pt-0 text-slate-400 leading-relaxed text-sm border-t border-white/5 mt-2">
-                       <div className="pt-4">
-                         {faq.answer}
-                       </div>
+                      <div className="pt-4">
+                        {faq.answer}
+                      </div>
                     </div>
                   </motion.div>
                 )}

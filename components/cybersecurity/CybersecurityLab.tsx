@@ -75,7 +75,19 @@ export const CybersecurityLab: React.FC<CybersecurityLabProps> = ({ onClose }) =
     }
 
     return (
-        <div className="fixed inset-0 z-[60] bg-slate-950 text-white overflow-hidden flex flex-col md:flex-row">
+        <div className="fixed inset-0 z-[1000] bg-slate-950 text-white overflow-hidden flex flex-col md:flex-row">
+            {/* Global Exit Button - Standardized with other high-fidelity labs */}
+            <div className="fixed top-4 right-4 z-[999999] pointer-events-auto">
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    className="p-3 bg-slate-800 hover:bg-red-600 text-white rounded-full transition-all shadow-2xl active:scale-95 border border-white/10"
+                    title="Exit Lab"
+                    aria-label="Exit Lab"
+                >
+                    <X size={24} />
+                </button>
+            </div>
+
             {/* Sidebar - Module List */}
             {/* Mobile: Drawer overlay */}
             <div className={`

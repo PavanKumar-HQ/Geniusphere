@@ -6,8 +6,12 @@ import {
     CheckCircle, Info, Hash, Menu, X, Brain, Database, Layers, Activity
 } from 'lucide-react';
 import { LAB_CONFIGS } from './LabData';
+import { TEACHING_LAB_CONFIGS } from './TeachingLabData';
+import { STUDENT_LAB_CONFIGS } from './StudentLabData';
 import { LabAnimationPlayer } from './LabAnimationPlayer';
 import { LabModule } from './LabTypes';
+
+const ALL_LAB_CONFIGS = { ...LAB_CONFIGS, ...TEACHING_LAB_CONFIGS, ...STUDENT_LAB_CONFIGS };
 
 interface UniversalLabProps {
     simulationId: string;
@@ -73,7 +77,7 @@ const THEME_MAP = {
 
 export const UniversalLab: React.FC<UniversalLabProps> = ({ simulationId, onClose }) => {
 
-    const config = LAB_CONFIGS[simulationId];
+    const config = ALL_LAB_CONFIGS[simulationId];
 
     // Fallback if config not found
     if (!config) {
@@ -152,7 +156,19 @@ export const UniversalLab: React.FC<UniversalLabProps> = ({ simulationId, onClos
     }
 
     return (
-        <div className="fixed inset-0 z-[60] bg-slate-950 text-white overflow-hidden flex flex-col md:flex-row font-sans">
+        <div className="fixed inset-0 z-[1000] bg-slate-950 text-white overflow-hidden flex flex-col md:flex-row font-sans">
+            {/* Global Exit Button - Standardized with other high-fidelity labs */}
+            <div className="fixed top-4 right-4 z-[999999] pointer-events-auto">
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    className="p-3 bg-slate-800 hover:bg-red-600 text-white rounded-full transition-all shadow-2xl active:scale-95 border border-white/10"
+                    title="Exit Lab"
+                    aria-label="Exit Lab"
+                >
+                    <X size={24} />
+                </button>
+            </div>
+
             {/* Sidebar - Module List */}
             {/* Mobile: Drawer overlay */}
             <div className={`

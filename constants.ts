@@ -376,7 +376,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Office', 'Productivity', 'Excel'],
     status: 'active',
-    simulationId: 'default', // Using Particle Network as generic tech lab
+    simulationId: 'sim_office',
     modules: createMockModules('Microsoft Office', 10),
     quiz: createMockQuiz('Microsoft Office')
   },
@@ -404,7 +404,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Privacy', 'Social Media', 'Safety'],
     status: 'active',
-    simulationId: 'cyber-lab', // Fits security theme
+    simulationId: 'sim_digital_privacy',
     modules: createMockModules('Digital Privacy', 10),
     quiz: createMockQuiz('Digital Privacy')
   },
@@ -420,7 +420,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Budgeting', 'Savings', 'Money'],
     status: 'active',
-    simulationId: 'sim_finance_budget',
+    simulationId: 'sim_intro_finance',
     modules: [
       { id: 'fin_intro_01', title: 'Understanding Money & Making Smart Choices', description: 'Learn what financial literacy means, why it matters in daily life, and how to clearly tell needs from wants', videoUrl: 'https://www.youtube.com/watch?v=GBpUqhCWPQw', duration: '10:00', contentMarkdown: '## Module 1: Understanding Money & Making Smart Choices\n\nLearn the fundamentals of financial literacy and smart money decisions.' },
       { id: 'fin_intro_02', title: 'Budgeting, Saving & Growing Your Money', description: 'Understand how to track your income and expenses, make saving a habit, and get a simple introduction to investing', videoUrl: 'https://www.youtube.com/watch?v=IV9YRqAa0ec', duration: '10:00', contentMarkdown: '## Module 2: Budgeting, Saving & Growing Your Money\n\nMaster budgeting techniques and learn how to grow your wealth.' },
@@ -445,7 +445,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Fintech', 'Apps', 'Payments'],
     status: 'active',
-    simulationId: 'sim_blockchain_hash', // Fintech uses blockchain concepts
+    simulationId: 'sim_fintech',
     modules: createMockModules('Fintech', 10),
     quiz: createMockQuiz('Fintech')
   },
@@ -473,7 +473,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Stocks', 'Investing', 'Markets'],
     status: 'active',
-    simulationId: 'sim_market_trade',
+    simulationId: 'sim_stock_market',
     modules: createMockModules('Stock Market', 10),
     quiz: createMockQuiz('Stock Market')
   },
@@ -487,7 +487,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Crypto', 'Bitcoin', 'Assets'],
     status: 'active',
-    simulationId: 'sim_blockchain_hash',
+    simulationId: 'sim_crypto',
     modules: createMockModules('Cryptocurrency', 10),
     quiz: createMockQuiz('Cryptocurrency')
   },
@@ -501,7 +501,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Economy', 'Global', 'News'],
     status: 'active',
-    simulationId: 'sim_market_trade',
+    simulationId: 'sim_global_economy',
     modules: createMockModules('Global Economy', 10),
     quiz: createMockQuiz('Global Economy')
   },
@@ -517,7 +517,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Soft Skills', 'Confidence', 'Etiquette'],
     status: 'active',
-    simulationId: 'sim_soft_comm',
+    simulationId: 'sim_prof_skills',
     modules: [
       { id: 'prof_soft_01', title: 'Core Foundations of Professional Growth', description: 'Mastering Professional Skills introduces the basics needed for success, while effective communication and strategic time management help you express ideas clearly', videoUrl: 'https://www.youtube.com/watch?v=ylD3yVPnJjc', duration: '10:00', contentMarkdown: '## Module 1: Core Foundations of Professional Growth\n\nBuild the essential foundations for professional success.' },
       { id: 'prof_soft_02', title: 'Teamwork, Problem-Solving & Leadership', description: 'Collaborative teamwork builds strong group skills, effective problem-solving strengthens analytical thinking, and impactful leadership helps you guide others', videoUrl: 'https://www.youtube.com/watch?v=GxekwgerYro', duration: '10:00', contentMarkdown: '## Module 2: Teamwork, Problem-Solving & Leadership\n\nDevelop collaborative and leadership capabilities.' },
@@ -570,7 +570,7 @@ export const COURSES: Course[] = [
     duration: '10 Modules',
     tags: ['Branding', 'LinkedIn', 'Career'],
     status: 'active',
-    simulationId: 'sim_soft_comm',
+    simulationId: 'sim_social_profile',
     modules: createMockModules('Social Profile', 10),
     quiz: createMockQuiz('Social Profile')
   }

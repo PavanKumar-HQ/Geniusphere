@@ -36,7 +36,7 @@ export interface LabModule {
     funFact: string;
     badge: string;
     icon?: string; // Icon name from lucide-react
-    animationType?: 'process_flow' | 'neural_network' | 'growth_chart' | 'budget_pie' | 'hashing' | 'iot_sensor';
+    animationType?: 'process_flow' | 'neural_network' | 'growth_chart' | 'budget_pie' | 'hashing' | 'iot_sensor' | 'classroom' | 'conversation';
 }
 
 export interface LabConfig {

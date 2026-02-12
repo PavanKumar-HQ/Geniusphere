@@ -562,11 +562,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ course, onExit }) =>
                             if (course.simulationId === 'cyber-lab') {
                                 return <CybersecurityLab onClose={() => setViewState('video')} />;
                             }
-                            // 2. new Universal Lab System
-                            if (course.simulationId && LAB_CONFIGS[course.simulationId]) {
-                                return <UniversalLab simulationId={course.simulationId} onClose={() => setViewState('video')} />;
-                            }
-                            // 3. Fallback to original InteractiveLearning
+
+                            // 2. Use Universal Lab System via InteractiveLearning (handles both overrides and template)
                             return (
                                 <InteractiveLearning
                                     simulationId={course.simulationId || 'default'}
